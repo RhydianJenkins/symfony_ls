@@ -1,6 +1,6 @@
 # Work in Progress
 
-This is as much a learning excersize for me as it is a tool that I am going to use
+This is as much a learning exercise for me as it is a tool that I am going to use
 
 ## To test:
 
