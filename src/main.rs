@@ -1,17 +1,18 @@
+mod handlers;
+
 use std::error::Error;
 
-use lsp_types::{
-    request::GotoDefinition, GotoDefinitionResponse, InitializeParams, ServerCapabilities,
-};
-use lsp_types::{HoverProviderCapability, Location, OneOf, Position, Range, Url};
+use lsp_types::OneOf;
+use lsp_types::{request::GotoDefinition, InitializeParams, ServerCapabilities};
 
 use lsp_server::{Connection, ExtractError, Message, Request, RequestId, Response};
+
+use handlers::definitions;
 
 fn main() -> Result<(), Box<dyn Error + Sync + Send>> {
     let (connection, io_threads) = Connection::stdio();
     let server_capabilities = serde_json::to_value(&ServerCapabilities {
         definition_provider: Some(OneOf::Left(true)),
-        hover_provider: Some(HoverProviderCapability::Simple(true)),
         ..Default::default()
     })
     .unwrap();
@@ -45,29 +46,10 @@ fn main_loop(
                 }
                 match cast::<GotoDefinition>(req.clone()) {
                     Ok((id, params)) => {
-                        eprintln!("got gotoDefinition request #{id}: {params:?}");
-                        let locations = definition::GoToDefinition(params)?;
-                        let result = Some(GotoDefinitionResponse::Array(locations));
-                        let result = serde_json::to_value(&result).unwrap();
+                        let definitions = definitions::find_definitions(params)?;
                         let resp = Response {
                             id,
-                            result: Some(result),
-                            error: None,
-                        };
-                        connection.sender.send(Message::Response(resp))?;
-                        continue;
-                    }
-                    Err(err @ ExtractError::JsonError { .. }) => panic!("{err:?}"),
-                    Err(ExtractError::MethodMismatch(req)) => req,
-                };
-                match cast::<lsp_types::request::HoverRequest>(req.clone()) {
-                    Ok((id, params)) => {
-                        eprintln!("got hover request #{id}: {params:?}");
-                        let result = Some("Hello, world!".to_string());
-                        let result = serde_json::to_value(&result).unwrap();
-                        let resp = Response {
-                            id,
-                            result: Some(result),
+                            result: Some(serde_json::to_value(&definitions).unwrap()),
                             error: None,
                         };
                         connection.sender.send(Message::Response(resp))?;
