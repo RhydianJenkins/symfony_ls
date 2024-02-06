@@ -36,35 +36,6 @@ fn main_loop(
     connection: Connection,
     params: serde_json::Value,
 ) -> Result<(), Box<dyn Error + Sync + Send>> {
-    let locations: Vec<lsp_types::Location> = vec![
-        Location {
-            uri: Url::parse("file:/home/rhydian/dotfiles/nvim/after/plugin/lspconfig.lua")?,
-            range: Range {
-                start: Position {
-                    line: 1,
-                    character: 1,
-                },
-                end: Position {
-                    line: 1,
-                    character: 1,
-                },
-            },
-        },
-        Location {
-            uri: Url::parse("file:/home/rhydian/dotfiles/nvim/after/plugin/lspconfig.lua")?,
-            range: Range {
-                start: Position {
-                    line: 1,
-                    character: 1,
-                },
-                end: Position {
-                    line: 1,
-                    character: 1,
-                },
-            },
-        },
-    ];
-
     let _params: InitializeParams = serde_json::from_value(params).unwrap();
     for msg in &connection.receiver {
         match msg {
@@ -75,7 +46,8 @@ fn main_loop(
                 match cast::<GotoDefinition>(req.clone()) {
                     Ok((id, params)) => {
                         eprintln!("got gotoDefinition request #{id}: {params:?}");
-                        let result = Some(GotoDefinitionResponse::Array(locations.clone()));
+                        let locations = definition::GoToDefinition(params)?;
+                        let result = Some(GotoDefinitionResponse::Array(locations));
                         let result = serde_json::to_value(&result).unwrap();
                         let resp = Response {
                             id,
