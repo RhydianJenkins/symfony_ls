@@ -47,9 +47,10 @@ fn main_loop(
                 match cast::<GotoDefinition>(req.clone()) {
                     Ok((id, params)) => {
                         let definitions = definitions::find_definitions(params)?;
+                        let result = serde_json::to_value(&definitions).unwrap();
                         let resp = Response {
                             id,
-                            result: Some(serde_json::to_value(&definitions).unwrap()),
+                            result: Some(result),
                             error: None,
                         };
                         connection.sender.send(Message::Response(resp))?;
