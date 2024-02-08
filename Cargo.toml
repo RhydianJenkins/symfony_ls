@@ -1,11 +1,12 @@
 [package]
-name = "symfony_lsp"
+name = "symfony_ls"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.79"
 lsp-server = "0.7.6"
 lsp-types = "0.95.0"
 serde = "1.0.196"
