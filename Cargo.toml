@@ -1,5 +1,5 @@
 [package]
-name = "symfony_lsp"
+name = "symfony_ls"
 version = "0.1.0"
 edition = "2021"
 

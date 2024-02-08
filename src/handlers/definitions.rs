@@ -6,12 +6,12 @@ pub fn find_definitions(params: GotoDefinitionParams) -> Result<GotoDefinitionRe
         uri: params.text_document_position_params.text_document.uri,
         range: Range {
             start: Position {
-                line: 1,
-                character: 1,
+                line: 0,
+                character: 0,
             },
             end: Position {
-                line: 1,
-                character: 1,
+                line: 0,
+                character: 0,
             },
         },
     }];
